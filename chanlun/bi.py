@@ -145,7 +145,7 @@ def _Cal_MERGE(combs: List[stCombineK]) -> int:
         combs[pLast].data.low = low
         combs[pLast].data.high = high
         combs[pLast].pos_end = pos_end
-        combs[pLast].pos_base = index
+        combs[pLast].pos_extreme = index
 
         pPrev = pLast
         return
@@ -174,17 +174,17 @@ def _Cal_MERGE(combs: List[stCombineK]) -> int:
         else:
             if greater_than_0(combs[pCur].data.high - combs[pPrev].data) or less_than_0(combs[pCur].data.low - combs[pPrev].data.low):
                 if bUp:  # 右包含
-                    index = combs[pPrev].pos_base if equ_than_0(combs[pCur].data.high-combs[pPrev].data.high) else combs[pCur].pos_begin
+                    index = combs[pPrev].pos_extreme if equ_than_0(combs[pCur].data.high - combs[pPrev].data.high) else combs[pCur].pos_begin
                     ContainsK(combs, combs[pCur].data.low, combs[pPrev].data.high, index, combs[pCur].pos_begin)
                 else:
-                    index = combs[pPrev].pos_base if equ_than_0(combs[combs[pCur].data.low-combs[pPrev].data.low]) else combs[pCur].pos_begin
+                    index = combs[pPrev].pos_extreme if equ_than_0(combs[combs[pCur].data.low - combs[pPrev].data.low]) else combs[pCur].pos_begin
                     ContainsK(combs, combs[pCur].data.low, combs[pPrev].data.high, index, combs[pCur].pos_begin)
             else:
                 if bUp:  # 左包含
-                    index = combs[pPrev].pos_begin if combs[pPrev].pos_begin == combs[pPrev].pos_end else combs[pPrev].pos_base
+                    index = combs[pPrev].pos_begin if combs[pPrev].pos_begin == combs[pPrev].pos_end else combs[pPrev].pos_extreme
                     ContainsK(combs, combs[pCur].data.low, combs[pPrev].data.high, index, combs[pCur].pos_begin)
                 else:
-                    index = combs[pPrev].pos_begin if combs[pPrev].pos_begin == combs[pPrev].pos_end else combs[pPrev].pos_base
+                    index = combs[pPrev].pos_begin if combs[pPrev].pos_begin == combs[pPrev].pos_end else combs[pPrev].pos_extreme
                     ContainsK(combs, combs[pPrev].data.low, combs[pCur].data.high, index, combs[pCur].pos_begin)
         pCur += 1
 
@@ -208,13 +208,15 @@ def Cal_UPPER(m_pData: List[KLine], m_MinPoint, m_MaxPoint) -> List[bool]:
         while pNextKline <= pEndKline:
             if pCurKline.data.high > pPrevKline.data.high and pCurKline.data.high > pNextKline.data.high and \
                pCurKline.data.low > pPrevKline.data.low and pCurKline.data.low > pNextKline.data.low:
-                ret[pCurKline.pos_base] = True
+                ret[pCurKline.pos_extreme] = True
 
             pPrevKline = pCurKline
             pCurKline = pNextKline
             pNextKline += 1
 
     return ret
+
+
 def Cal_LOWER(m_pData: List[KLine], m_MinPoint, m_MaxPoint) -> List[bool]:
     klines: List[stCombineK] = []
     for i in range(m_MinPoint, m_MaxPoint):
@@ -232,7 +234,7 @@ def Cal_LOWER(m_pData: List[KLine], m_MinPoint, m_MaxPoint) -> List[bool]:
         while pNextKline <= pEndKline:
             if pCurKline.data.high < pPrevKline.data.high and pCurKline.data.high < pNextKline.data.high and \
                pCurKline.data.low < pPrevKline.data.low and pCurKline.data.low < pNextKline.data.low:
-                ret[pCurKline.pos_base] = True
+                ret[pCurKline.pos_extreme] = True
 
             pPrevKline = pCurKline
             pCurKline = pNextKline

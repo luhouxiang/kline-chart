@@ -5,6 +5,7 @@
 @description: K线数据元素
 """
 from datetime import datetime
+from enum import Enum
 
 
 class KLine:
@@ -26,17 +27,23 @@ class KLine:
         return self.__str__()
 
 
+class KSide(Enum):
+    INITIAL = 0
+    UP = 1
+    DOWN = -1
+
+
 class stCombineK:
     def __init__(self, data, begin, end, base, isup):
         self.data: KLine = data     # K线数据
-        self.pos_begin = begin  # 起始
-        self.pos_end = end    # 结束
-        self.pos_base = base   # 最高或者最低位置
-        self.isUp = isup   # 是否向上
+        self.pos_begin: int = begin      # 起始
+        self.pos_end: int = end          # 结束
+        self.pos_extreme: int = base     # 最高或者最低位置,极值点位置
+        self.isUp: KSide = KSide(isup)            # 是否向上
 
     def __str__(self):
         up = "up" if self.isUp else "down"
-        return "[{}]:begin:{},end:{},base:{}".format(up, self.pos_begin, self.pos_end, self.pos_base)
+        return "[{}]:begin:{},end:{},base:{}".format(up, self.pos_begin, self.pos_end, self.pos_extreme)
 
     def __repr__(self):
         return self.__str__()
