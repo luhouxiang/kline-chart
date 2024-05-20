@@ -68,4 +68,27 @@ def _Cal_MERGE(combs: List[stCombineK]) -> int:
             ContainsK(combs, combs[pCur].data.low, combs[pPrev].data.high, combs[pPrev].pos_begin, combs[pCur].pos_begin)
 
     while pCur <= pEnd:
-        pass
+        if greater_than_0(combs[pCur].data.high - combs[pPrev].data.high) and \
+                greater_than_0(combs[pCur].data.low - combs[pPrev].data.low):
+            IndependentK(combs, KSide.UP)
+        elif less_than_0(combs[pCur].data.high - combs[pPrev].data.high) and \
+                less_than_0(combs[pCur].data.low - combs[pPrev].data.low):
+            IndependentK(combs, KSide.DOWN)
+        else:
+            if greater_than_0(combs[pCur].data.high - combs[pPrev].data.high) or \
+                    less_than_0(combs[pCur].data.low - combs[pPrev].data):
+                if bUp.UP:    # 向上
+                    pos_index = combs[pPrev].pos_extreme if equ_than_0(combs[pCur].data.high - combs[pPrev].data.high) else combs[pCur].pos_begin
+                    ContainsK(combs[pPrev].data.low, combs[pCur].data.high, pos_index, combs[pCur].pos_begin)
+                else:
+                    pos_index = combs[pPrev].pos_extreme if equ_than_0(combs[pCur].data.low - combs[pPrev].data.low) else combs[pCur].pos_begin
+                    ContainsK(combs[pCur].data.low, combs[pPrev].data.high, pos_index, combs[pCur].pos_begin)
+            else:
+                if bUp.UP:
+                    pos_index = combs[pPrev].pos_end if combs[pPrev].pos_begin == combs[pPrev].pos_end else combs[pPrev].pos_extreme
+                    ContainsK(combs[pCur].data.low, combs[pPrev].data.high, pos_index, combs[pCur].pos_begin)
+                else:
+                    pos_index = combs[pPrev].pos_begin if combs[pPrev].pos_begin == combs[pPrev].pos_end else combs[pPrev].pos_extreme
+                    ContainsK(combs[pPrev].data.low, combs[pCur].data.high, pos_index, combs[pCur].pos_begin)
+        pCur += 1
+    return pLast - pBegin + 1   # 得出独立K线的数量
