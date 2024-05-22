@@ -9,14 +9,16 @@ from enum import Enum
 
 
 class KLine:
+    """K线类
+    """
     def __init__(self, time=0, open=0, high=0, low=0, close=0, volume=0, symbol=""):
-        self.time = time
-        self.open = open
-        self.close = close
-        self.high = high
-        self.low = low
-        self.volume = volume
-        self.symbol = symbol  # 合约号
+        self.time = time    # 时间
+        self.open = open    # 开
+        self.high = high    # 高
+        self.low = low      # 低
+        self.close = close  # 收
+        self.volume = volume    # 成交量
+        self.symbol = symbol    # 合约号
 
     def __str__(self):
         return "t:{},o:{},h:{},l:{},c:{},v:{}".\
@@ -28,12 +30,16 @@ class KLine:
 
 
 class KSide(Enum):
+    """K线方向
+    """
     INITIAL = 0
     UP = 1
     DOWN = -1
 
 
 class stCombineK:
+    """K线合并类
+    """
     def __init__(self, data, begin, end, base, isup):
         self.data: KLine = data     # K线数据
         self.pos_begin: int = begin      # 起始
