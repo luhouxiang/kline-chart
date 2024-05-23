@@ -10,7 +10,7 @@
 from model.kline import KLine, stCombineK, KSide
 from typing import List, Any
 from chanlun.float_compare import *
-from copy import copy
+import copy
 
 
 def _Cal_MERGE(combs: List[stCombineK]) -> int:
@@ -38,7 +38,7 @@ def _Cal_MERGE(combs: List[stCombineK]) -> int:
         bUp = b_up
         pPrev = pCur
         pLast += 1  # 每处理一根独立K线，pLast增加1
-        combs[pLast] = copy(combs[pCur])    # 值的拷贝，而不是指针, 总是拷贝第一个
+        combs[pLast] = copy.deepcopy(combs[pCur])    # 值的拷贝，而不是指针, 总是拷贝第一个
         return
 
     def ContainsK(combs: List[stCombineK], low, high, index, pos_end):
@@ -158,6 +158,14 @@ def Cal_UPPER(m_pData: List[KLine], m_MinPoint, m_MaxPoint):
     return ret
 
 
+def Cal_MERGE(m_pData: List[KLine], m_MinPoint, m_MaxPoint):
+    """合并最后返回对应的K线"""
+    klines: List[KLine] = []
+    for i in range(m_MinPoint, m_MaxPoint):
+        klines.append(copy.deepcopy(m_pData[i]))
+
+    for i in range(1, len(klines)):
+        pass
 
 
 
