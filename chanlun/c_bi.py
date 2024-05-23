@@ -114,21 +114,55 @@ def Cal_LOWER(m_pData: List[KLine], m_MinPoint, m_MaxPoint):
 
     if nCount <= 2:  # 小于等于2的，直接退出
         return ret
-    pPrevKline = 0
-    pCurKline = pPrevKline + 1
-    pNextKline = pCurKline + 1
-    pEndKline = pPrevKline + nCount - 1
+    pPrev = 0
+    pCur = pPrev + 1
+    pNext = pCur + 1
+    pEnd = pPrev + nCount - 1
 
-    while pNextKline <= pEndKline:
-        if less_than_0(combs[pCurKline].data.high - combs[pPrevKline].data.high) and \
-                less_than_0(combs[pCurKline].data.high - combs[pNextKline].data.high) and \
-            less_than_0(combs[pCurKline].data.low - combs[pPrevKline].data.low) and \
-            less_than_0(combs[pCurKline].data.low - combs[pNextKline].data.low):
-            ret[combs[pCurKline].pos_extreme] = True
-            pPrevKline += 1
-            pCurKline += 1
-            pNextKline += 1
+    while pNext <= pEnd:
+        if (less_than_0(combs[pCur].data.high - combs[pPrev].data.high) and
+                less_than_0(combs[pCur].data.high - combs[pNext].data.high) and
+                less_than_0(combs[pCur].data.low - combs[pPrev].data.low) and
+                less_than_0(combs[pCur].data.low - combs[pNext].data.low)):
+            ret[combs[pCur].pos_extreme] = True
+        pPrev += 1
+        pCur += 1
+        pNext += 1
     return ret
+
+
+def Cal_UPPER(m_pData: List[KLine], m_MinPoint, m_MaxPoint):
+    """计算顶分型"""
+    combs: List[stCombineK] = []
+    for i in range(m_MinPoint, m_MaxPoint):
+        data = stCombineK(m_pData[i], i, i, i, KSide.DOWN)
+        combs.append(data)
+    nCount = _Cal_MERGE(combs)
+    ret = [False] * len(combs)
+    if nCount <= 2:
+        return ret
+
+    pPrev = 0
+    pCur = pPrev + 1
+    pNext = pCur + 1
+    pEnd = pPrev + nCount - 1
+    while pNext <= pEnd:
+        if (greater_than_0(combs[pCur].data.high - combs[pPrev].data.high) and
+                greater_than_0(combs[pCur].data.high - combs[pNext].data.high) and
+                greater_than_0(combs[pCur].data.low - combs[pPrev].data.low) and
+                greater_than_0(combs[pCur].data.low - combs[pNext].data.low)):
+            ret[combs[pCur].pos_extreme] = True     # 顶分型
+        pPrev += 1
+        pCur += 1
+        pNext += 1
+    return ret
+
+
+
+
+
+
+
 
 
 
