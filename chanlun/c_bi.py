@@ -158,6 +158,16 @@ def Cal_UPPER(m_pData: List[KLine], m_MinPoint, m_MaxPoint):
     return ret
 
 
+def pre_(klines: List[KLine], base: int) -> int:
+    """向前查找不相等的，返回左边的那个索引，若找不到，返回-1"""
+    for i in range(base, 0, -1):
+        if klines[i].high == klines[i-1].high and klines[i-1].low == klines[i].low:  # 完全相等，往回走
+            pass
+        else:
+            return i-1
+    return -1
+
+
 def Cal_MERGE(m_pData: List[KLine], m_MinPoint, m_MaxPoint):
     """合并最后返回对应的K线"""
     klines: List[KLine] = []
@@ -165,7 +175,68 @@ def Cal_MERGE(m_pData: List[KLine], m_MinPoint, m_MaxPoint):
         klines.append(copy.deepcopy(m_pData[i]))
 
     for i in range(1, len(klines)):
-        pass
+        contain_flag = ((klines[i].high >= klines[i-1].high and klines[i].low <= klines[i-1].low) or  # 右包含
+                        (klines[i].high <= klines[i-1].high and klines[i].low >= klines[i-1].low))    # 左包含
+        if not contain_flag:
+            continue
+
+        if i == 1:  # 第一根线,右包含向上取,左包含向下取
+            if klines[i].high > klines[i-1].high:   # 如果是右包含，高中取高，低中取高
+                klines[i].high = klines[i-1].high = max(klines[i].high, klines[i-1].high)
+                klines[i].low = klines[i-1].low = max(klines[i].low, klines[i-1].low)
+            else:
+                klines[i].high = klines[i-1].high = min(klines[i].high, klines[i-1].high)
+                klines[i].low = klines[i-1].low = min(klines[i].low, klines[i-1].low)
+            continue
+
+        pre = i - 2
+        cur = i - 1
+        if pre < 0:
+            continue
+        while ((klines[cur].high > klines[pre].high and klines[cur].low < klines[pre].low) or
+               (klines[cur].high < klines[pre].high and klines[cur].low > klines[pre].low) or
+               (klines[cur].high == klines[pre].high and klines[cur].low == klines[pre].low)):
+            # 右包含，左包含，完全相等三种情况，回退一格,一直回退到没有包含的情况
+            pre -= 1
+            cur -= 1
+            if pre < 0 or cur < 0:
+                break
+        if pre < 0 or cur < 0:
+            continue
+
+        if ((klines[cur].high > klines[pre].high and klines[cur].low > klines[pre].low) or
+                (klines[cur].high == klines[pre].high and klines[cur].low > klines[pre].low)):
+            # 看起来有一个低点相等的条件没有考虑，不过也可以不考虑，因为这实际上是包含 TODO: 其实是包含，应该被合并
+            # 往前找到一个pre低，当前高的, 即up, 向上合并
+            pre_kline = pre_(klines, i - 1)
+            klines[i].high = klines[i-1].high = max(klines[i].high, klines[i-1].high)
+            klines[i].low = klines[i-1].low = max(klines[i].low, klines[i-1].low)
+            if pre_kline < 0:
+                pass
+            else:
+                for k in range(pre_kline+1, i-1):
+                    klines[k].high = klines[i].high
+                    klines[k].low = klines[i].low
+        elif ((klines[cur].high < klines[pre].high and klines[cur].low < klines[pre].low) or
+              (klines[cur].high == klines[pre].high and klines[cur].low < klines[pre].low)):
+            # 往前找到一个pre高，当前低的，即down，向下合并
+            pre_kline = pre_(klines, i-1)
+            klines[i].high = klines[i-1].high = min(klines[i].high, klines[i-1].high)
+            klines[i].low = klines[i-1].low = min(klines[i].low, klines[i-1].low)
+            if pre_kline < 0:
+                pass
+            else:
+                for k in range(pre_kline+1, i-1):
+                    klines[k].high = klines[i].high
+                    klines[k].low = klines[i].low
+    return klines
+
+
+
+
+
+
+
 
 
 
