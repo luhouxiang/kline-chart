@@ -13,6 +13,8 @@ from utils.user_logbook import user_log as logger
 from typing import List, Any
 from model.obj import Direction
 from chanlun.bi import Cal_OLD_TEST
+from chanlun.c_bi import Cal_LOWER
+from chanlun.c_bi import Cal_UPPER
 
 
 def fn_calc_ma20_60(klines: list[KLine]):
@@ -45,7 +47,7 @@ def fn_calc_signal(klines: list[KLine]) -> List[Any]:
     for i in range(len(klines)):
         if i % 10 == 0:
             dt = datetime.fromtimestamp(klines[i].time)
-            bars[dt] = [dt, i % 3]
+            bars[dt] = [dt, -(i % 3)]
     return bars
 
 
@@ -56,6 +58,20 @@ def fn_calc_volumes(klines: list[KLine]):
         dt = datetime.fromtimestamp(k.time)
         bars[dt] = [dt, k.volume]
     return bars
+
+
+def fn_calc_up_lower_upper(klines: List[KLine]):
+    lower = Cal_LOWER(klines, 0, len(klines)-1)
+    upper = Cal_UPPER(klines, 0, len(klines)-1)
+    merge = {}
+    for i in range(len(lower)):
+        dt = datetime.fromtimestamp(klines[i].time)
+        if lower[i]:
+            merge[dt] = [dt, -1]
+        elif upper[i]:
+            merge[i] = [dt, 1]
+    return merge
+
 
 
 def fn_calc_bi(klines: list[KLine]) -> List[Any]:

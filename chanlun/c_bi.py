@@ -83,25 +83,25 @@ def _Cal_MERGE(combs: List[stCombineK]) -> int:
                 if bUp.UP:    # 向上，一样高取左极值，不一样高肯定是右高，取右值
                     pos_index = combs[pPrev].pos_extreme if equ_than_0(combs[pCur].data.high - combs[pPrev].data.high) \
                         else combs[pCur].pos_begin
-                    ContainsK(combs[pPrev].data.low, combs[pCur].data.high, pos_index, combs[pCur].pos_begin)
+                    ContainsK(combs, combs[pPrev].data.low, combs[pCur].data.high, pos_index, combs[pCur].pos_begin)
                 else:         # 向下，一样低取左极值，不一样低肯定是右低，取右值
                     pos_index = combs[pPrev].pos_extreme if equ_than_0(combs[pCur].data.low - combs[pPrev].data.low) \
                         else combs[pCur].pos_begin
-                    ContainsK(combs[pCur].data.low, combs[pPrev].data.high, pos_index, combs[pCur].pos_begin)
+                    ContainsK(combs, combs[pCur].data.low, combs[pPrev].data.high, pos_index, combs[pCur].pos_begin)
             else:   # 左包含
                 if bUp.UP:  # 向上，一样高取左极值，否则高肯定是右高，取右值
                     pos_index = combs[pPrev].pos_extreme if equ_than_0(combs[pPrev].data.high - combs[pCur].data.high) \
                         else combs[pCur].pos_begin
-                    ContainsK(combs[pCur].data.low, combs[pPrev].data.high, pos_index, combs[pCur].pos_begin)
+                    ContainsK(combs, combs[pCur].data.low, combs[pPrev].data.high, pos_index, combs[pCur].pos_begin)
                 else:       # 向下，一样低取左极值，否则低肯定是右低，取右值
                     pos_index = combs[pPrev].pos_extreme if equ_than_0(combs[pPrev].data.low - combs[pCur].data.low) \
                         else combs[pCur].pos_begin
-                    ContainsK(combs[pPrev].data.low, combs[pCur].data.high, pos_index, combs[pCur].pos_begin)
+                    ContainsK(combs, combs[pPrev].data.low, combs[pCur].data.high, pos_index, combs[pCur].pos_begin)
         pCur += 1
     return pLast - pBegin + 1   # 得出独立K线的数量
 
 
-def Cal_LOWER(m_pData: List[KLine], m_MinPoint, m_MaxPoint):
+def Cal_LOWER(m_pData: List[KLine], m_MinPoint, m_MaxPoint) -> List[bool]:
     """
     计算底分型
     """
@@ -131,7 +131,7 @@ def Cal_LOWER(m_pData: List[KLine], m_MinPoint, m_MaxPoint):
     return ret
 
 
-def Cal_UPPER(m_pData: List[KLine], m_MinPoint, m_MaxPoint):
+def Cal_UPPER(m_pData: List[KLine], m_MinPoint, m_MaxPoint) -> List[bool]:
     """计算顶分型"""
     combs: List[stCombineK] = []
     for i in range(m_MinPoint, m_MaxPoint):

@@ -30,5 +30,5 @@ plots:
     chart_item:
     -
       file_name: ""
-      func_name: fn_calc_signal
+      func_name: fn_calc_up_lower_upper
       type: Signal
