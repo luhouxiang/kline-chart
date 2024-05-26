@@ -33,7 +33,7 @@ class ChartStraight(ChartBase):
                 print("********item[2]:{}".format(item[2]))
             y2 = item[3]
             p = 0
-            if (x2 == x1):
+            if x2 == x1:
                 p = 0
             else:
                 p = (y2 - y1) / (x2 - x1)

@@ -19,7 +19,7 @@ from utils.user_logbook import user_log as logger, init_logger
 from model.kline import KLine
 from algo.zigzag import OnCalculate
 from algo.weibi import get_weibi_list
-from callback.call_back import fn_calc_ma20_60, fn_calc_wei_bi, fn_calc_bi
+from callback.call_back import *
 
 
 def calc_zig_zag(klines: List[KLine]):
@@ -27,12 +27,7 @@ def calc_zig_zag(klines: List[KLine]):
     return zig_zag
 
 
-def calc_volumes(klines: list[KLine]):
-    bars = {}
-    for k in klines:
-        dt = datetime.fromtimestamp(k.time)
-        bars[dt] = [dt, k.volume]
-    return bars
+
 
 
 def obtain_data_from_algo(klines: list[KLine], data: Dict[PlotIndex, PlotItemInfo]):

@@ -38,6 +38,26 @@ def fn_calc_wei_bi(klines: list[KLine]) -> List[Any]:
         items.append([w.sdt, p1, w.edt, p2, 0])
     return items
 
+
+def fn_calc_signal(klines: list[KLine]) -> List[Any]:
+    """生成一个整数5倍的signal"""
+    bars = {}
+    for i in range(len(klines)):
+        if i % 10 == 0:
+            dt = datetime.fromtimestamp(klines[i].time)
+            bars[dt] = [dt, i % 3]
+    return bars
+
+
+def fn_calc_volumes(klines: list[KLine]):
+    """回調計算成交量"""
+    bars = {}
+    for k in klines:
+        dt = datetime.fromtimestamp(k.time)
+        bars[dt] = [dt, k.volume]
+    return bars
+
+
 def fn_calc_bi(klines: list[KLine]) -> List[Any]:
     pass
     # Cal_OLD_TEST(klines)

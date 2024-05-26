@@ -30,5 +30,5 @@ plots:
     chart_item:
     -
       file_name: ""
-      func_name: calc_volumes
-      type: Volume
+      func_name: fn_calc_signal
+      type: Signal

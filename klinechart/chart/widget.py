@@ -527,25 +527,25 @@ class ChartCursor(QtCore.QObject):
         """"""
         buf = {}
 
-        # for item, plot in self._item_plot_map.items():
-        #     item_info_text = item.get_info_text(self._x)
-        #
-        #     if plot not in buf:
-        #         buf[plot] = item_info_text
-        #     else:
-        #         if item_info_text:
-        #             buf[plot] += ("\n\n" + item_info_text)
-        #
-        # for index, plot in enumerate(self._plots):
-        #     plot_name = index
-        #     plot_info_text = buf[plot]
-        #     info = self._infos[plot_name]
-        #     info.setText(plot_info_text)
-        #     info.show()
-        #
-        #     view = self._views[plot_name]
-        #     top_left = view.mapSceneToView(view.sceneBoundingRect().topLeft())
-        #     info.setPos(top_left)
+        for item, plot in self._item_plot_map.items():
+            item_info_text = item.get_info_text(self._x)
+
+            if plot not in buf:
+                buf[plot] = item_info_text
+            else:
+                if item_info_text:
+                    buf[plot] += ("\n\n" + item_info_text)
+
+        for index, plot in enumerate(self._plots):
+            plot_name = index
+            plot_info_text = buf[plot]
+            info = self._infos[plot_name]
+            info.setText(plot_info_text)
+            info.show()
+
+            view = self._views[plot_name]
+            top_left = view.mapSceneToView(view.sceneBoundingRect().topLeft())
+            info.setPos(top_left)
 
     def move_right(self) -> None:
         """
