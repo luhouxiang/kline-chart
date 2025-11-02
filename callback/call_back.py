@@ -9,13 +9,12 @@ from model.kline import KLine
 from algo.formula import MA
 from datetime import datetime
 from algo.weibi import get_weibi_list
-from utils.user_logbook import user_log as logger
 from typing import List, Any
 from model.obj import Direction
 from chanlun.bi import Cal_OLD_TEST
 from chanlun.c_bi import Cal_LOWER
 from chanlun.c_bi import Cal_UPPER
-
+import logging
 
 def fn_calc_ma20_60(klines: list[KLine]):
     """由配置文件回调ma20,ma60的计算过程"""
@@ -32,7 +31,7 @@ def fn_calc_ma20_60(klines: list[KLine]):
 def fn_calc_wei_bi(klines: list[KLine]) -> List[Any]:
     """回调计算过程"""
     wbs = get_weibi_list(klines, N=5)
-    logger.info(wbs)
+    logging.info(wbs)
     items = []
     for w in wbs:
         p1 = w.low if w.direction == Direction.Up else w.high

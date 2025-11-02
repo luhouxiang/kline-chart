@@ -4,7 +4,7 @@ from klinechart.chart.object import DataItem
 from .chart_base import ChartBase
 from .base import BAR_WIDTH
 from .manager import BarManager
-
+import logging
 
 class ChartSignal(ChartBase):
     """
@@ -22,6 +22,7 @@ class ChartSignal(ChartBase):
         If min_ix and max_ix not specified, then return range with whole data set.
         """
         min_value, max_value = self._manager.get_layout_range(self._layout_index, min_ix, max_ix)
+        # logging.info("get_y_range::min_max_value:【{}，{}】".format(min_value, max_value))
         return min_value, max_value
 
     def _draw_bar_picture(self, ix: int, old_bar: DataItem, bar: DataItem) -> QtGui.QPicture:
@@ -39,15 +40,14 @@ class ChartSignal(ChartBase):
             else:
                 painter.setPen(self._down_pen)
                 painter.setBrush(self._down_brush)
-
-            rect = QtCore.QRectF(
-                ix - BAR_WIDTH,
-                0,
-                BAR_WIDTH * 2,
-                bar[1]
-            )
-            painter.drawRect(rect)
-
+            if bar[1]:
+                rect = QtCore.QRectF(
+                    ix - BAR_WIDTH,
+                    0,
+                    BAR_WIDTH * 2,
+                    bar[1]
+                )
+                painter.drawRect(rect)
         # Finish
         painter.end()
         return volume_picture
@@ -60,6 +60,7 @@ class ChartSignal(ChartBase):
 
         if bar:
             text = f"signal: {bar[1]}"
+            # logging.info(f"signal: {bar[1]}")
         else:
             text = "signal: "
 

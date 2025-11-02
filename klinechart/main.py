@@ -15,12 +15,11 @@ from klinechart.chart.object import DataItem
 from klinechart.chart import PlotIndex, BarDict, PlotItemInfo, ChartItemInfo
 from klinechart.trader.config import conf
 from utils import file_txt
-from utils.user_logbook import user_log as logger, init_logger
 from model.kline import KLine
 from algo.zigzag import OnCalculate
 from algo.weibi import get_weibi_list
 from callback.call_back import *
-
+import logging
 
 def calc_zig_zag(klines: List[KLine]):
     zig_zag = OnCalculate(klines)
@@ -61,8 +60,8 @@ def load_data(conf: Dict[str, any]) -> Dict[PlotIndex, PlotItemInfo]:
             bar_dict: BarDict = calc_bars(data_list, item_info.data_type)
             item_info.bars = bar_dict
             plot_info[ItemIndex(item_index)] = item_info
-            logger.info(F"file_name: {item['file_name']}")
-            logger.info(F"plot_index:{plot_index}, item_index:{item_index}, len(bar_dict)={len(bar_dict)}")
+            logging.info(F"file_name: {item['file_name']}")
+            logging.info(F"plot_index:{plot_index}, item_index:{item_index}, len(bar_dict)={len(bar_dict)}")
         local_data[PlotIndex(plot_index)] = plot_info
 
     return local_data
@@ -81,7 +80,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         datas: Dict[PlotIndex, PlotItemInfo] = load_data(conf)
-        widget = ChartWidget()
+        widget = ChartWidget(self)
         widget.manager.update_history_klines(datas[PlotIndex(0)][ItemIndex(0)].bars.values())
         obtain_data_from_algo(widget.manager.klines, datas)
         weibis = get_weibi_list(widget.manager.klines)
@@ -119,8 +118,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
 if __name__ == '__main__':
-    init_logger("info")
-    logger.info(conf)
 
     app = QtWidgets.QApplication(sys.argv)
     w = MainWindow()

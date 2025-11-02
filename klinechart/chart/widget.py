@@ -1,14 +1,13 @@
-from typing import List, Dict, Type
+from typing import List, Dict, Type, Optional, Callable, Any
 
 import pyqtgraph as pg
 import os
-from utils.user_logbook import user_log as logger
 
 from PySide6.QtWidgets import QMessageBox
 showMessage = QMessageBox.question
 
 from PySide6 import QtGui, QtWidgets, QtCore
-from .object import PlotIndex, PlotItemInfo
+from .object import PlotIndex, ItemIndex, PlotItemInfo
 from .manager import BarManager
 from .base import (
     GREY_COLOR, WHITE_COLOR, CURSOR_COLOR, BLACK_COLOR,
@@ -17,7 +16,7 @@ from .base import (
 from .axis import DatetimeAxis
 from .chart_base import ChartBase
 from enum import Enum
-
+import logging
 
 pg.setConfigOptions(antialias=True)
 
@@ -28,14 +27,16 @@ class EAlignType(Enum): # 对齐方式
 
 
 class ChartWidget(pg.PlotWidget):
-    """"""
-    MIN_BAR_COUNT = 5
-    NORMAL_BAR_COUNT = 100
+    """
+    绘制和操作K线图类
+    """
+    MIN_BAR_COUNT = 5   # 最小K线数
+    NORMAL_BAR_COUNT = 100  # 默认显示的K线数
 
     def __init__(self, parent: QtWidgets.QWidget = None):
         """"""
         super().__init__(parent)
-
+        self.main_window = parent.window()
         self.manager: BarManager = BarManager()
 
         self._plots: List[pg.PlotItem] = []
@@ -45,10 +46,15 @@ class ChartWidget(pg.PlotWidget):
         self._first_plot: pg.PlotItem = None
         self._cursor: ChartCursor = None
 
-        self._right_ix: int = 0                     # Index of most right data
-        self._bar_count: int = self.NORMAL_BAR_COUNT   # Total bar visible in chart
+        self._right_ix: int = 0                     # 最右边K线的数据索引
+        self._bar_count: int = self.NORMAL_BAR_COUNT   # 图表中可见K线数量
 
         self._init_ui()
+
+    def update_all_view(self):
+        for v in self._plot_charts_dict.values():
+            for item in v:
+                item.update()
 
     def closeEvent(self, event):
         event.accept()
@@ -62,7 +68,10 @@ class ChartWidget(pg.PlotWidget):
         #     event.ignore()
 
     def _init_ui(self) -> None:
-        """"""
+        """
+        设置窗口标题，创建并配置图形布局，
+        设置边距，间距和边框颜色
+        """
         self.setWindowTitle("kline-chart")
 
         self._layout = pg.GraphicsLayout()
@@ -76,10 +85,13 @@ class ChartWidget(pg.PlotWidget):
         return DatetimeAxis(self.manager, orientation='bottom')
 
     def add_cursor(self) -> None:
-        """"""
+        """
+        添加光标方法
+        """
         if not self._cursor:
             self._cursor = ChartCursor(
                 self, self.manager, self._plots, self._item_plot_map)
+            self._cursor.main_window = self.main_window
 
     def add_plot(
         self,
@@ -89,6 +101,7 @@ class ChartWidget(pg.PlotWidget):
     ) -> None:
         """
         Add plot area.
+        添加绘图区域方法
         """
         # Create plot object
         plot = pg.PlotItem(axisItems={'bottom': self._get_new_x_axis()})
@@ -139,16 +152,17 @@ class ChartWidget(pg.PlotWidget):
     ):
         """
         Add chart item.
+        添加图表项目方法，用于在特定绘图区域添加图表项目
         """
         chart_index = 0 if layout_index not in self._plot_charts_dict else len(self._plot_charts_dict)
-        item = item_class(layout_index, chart_index, self.manager)
+        chart_item = item_class(layout_index, chart_index, self.manager)
         if layout_index not in self._plot_charts_dict:
             self._plot_charts_dict[layout_index] = []
-        self._plot_charts_dict[layout_index].append(item)
-        plot = self._plots[layout_index]
-        plot.addItem(item)
+        self._plot_charts_dict[layout_index].append(chart_item)
+        plot_item = self._plots[layout_index]
+        plot_item.addItem(chart_item)
 
-        self._item_plot_map[item] = plot
+        self._item_plot_map[chart_item] = plot_item
 
     def get_plot(self, plot_index: int) -> pg.PlotItem:
         """
@@ -158,7 +172,7 @@ class ChartWidget(pg.PlotWidget):
 
     def get_all_plots(self) -> List[pg.PlotItem]:
         """
-        Get all plot objects.
+        获取所有绘图区域方法
         """
         return self._plots
 
@@ -168,12 +182,12 @@ class ChartWidget(pg.PlotWidget):
         """
         self.manager.clear_all()
 
-        for items in self._plot_charts_dict.values():
-            for item in items:
-                item.clear_all()
-
-        if self._cursor:
-            self._cursor.clear_all()
+        # for items in self._plot_charts_dict.values():
+        #     for item in items:
+        #         item.clear_all()
+        #
+        # if self._cursor:
+        #     self._cursor.clear_all()
 
 
     # def update_history(self, history: List[BarData]) -> None:
@@ -191,10 +205,16 @@ class ChartWidget(pg.PlotWidget):
     #     #
     #     # self.move_to_right()
 
-    def update_all_history_data(self, datas: Dict[PlotIndex, PlotItemInfo]) -> None:
+
+    def update_all_history_data(self, datas: Dict[PlotIndex, PlotItemInfo],
+                                funcs: Optional[Callable[[Any, Dict[PlotIndex, PlotItemInfo]], None]] = None
+                                ) -> None:
         """
         设置历史数据
         """
+        self.manager.update_history_klines(datas[PlotIndex(0)][ItemIndex(0)].bars.values())
+        if funcs is not None:
+            funcs(self.manager.klines, datas)
         for plot_index, charts in self._plot_charts_dict.items():
             for chart_index, chart_item in enumerate(charts):
                 chart_info = datas[plot_index][chart_index]
@@ -236,7 +256,7 @@ class ChartWidget(pg.PlotWidget):
         """
         Update the x-axis range of plots.
         """
-        logger.info("cursor._x={}, _y={}".format(self._cursor._x, self._cursor._y))
+        # logging.info("cursor._x={}, _y={}".format(self._cursor._x, self._cursor._y))
         if align_type == EAlignType.center:
             max_ix = self._cursor._x + self._bar_count/2
             min_ix = self._cursor._x - self._bar_count/2
@@ -284,6 +304,7 @@ class ChartWidget(pg.PlotWidget):
             self._on_key_up()
         elif event.key() == QtCore.Qt.Key_Down:
             self._on_key_down()
+        super().keyPressEvent(event)
 
     def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
         """
@@ -349,7 +370,9 @@ class ChartWidget(pg.PlotWidget):
 
 
 class ChartCursor(QtCore.QObject):
-    """"""
+    """
+    光标类
+    """
 
     def __init__(
         self,
@@ -360,7 +383,7 @@ class ChartCursor(QtCore.QObject):
     ):
         """"""
         super().__init__()
-
+        self.main_window = None
         self._widget: ChartWidget = widget
         self._manager: BarManager = manager
         self._plots: List[pg.GraphicsObject] = plots
@@ -454,6 +477,7 @@ class ChartCursor(QtCore.QObject):
     def _mouse_moved(self, evt: tuple) -> None:
         """
         Callback function when mouse is moved.
+        鼠标移动事件处理方法
         """
         if not self._manager.get_count():
             return
@@ -475,6 +499,23 @@ class ChartCursor(QtCore.QObject):
         self._update_line()
         self._update_label()
         self.update_lefttop_info()
+
+    def update_lefttop_info(self):
+        # self.update_lefttop_info()
+        # Call the appropriate method based on mouse x position in main window
+        # Get the main window
+        # main_window = self.window()
+        main_window = self.main_window
+        # Get global mouse position
+        global_pos = QtGui.QCursor.pos()
+        # Map global position to main window coordinate system
+        main_pos = main_window.mapFromGlobal(global_pos)
+        # Determine the center x coordinate of the main window
+        center_x = main_window.width() / 2
+        if main_pos.x() < center_x:
+            self.update_left_right_top_info(False)
+        else:
+            self.update_left_right_top_info(True)
 
     def _update_line(self) -> None:
         """"""
@@ -516,15 +557,14 @@ class ChartCursor(QtCore.QObject):
             else:
                 label.hide()
 
-        dt = self._manager.get_datetime(self._x)
+        dt = self._manager.get_dt_from_index(self._x)
         if dt:
             self._x_label.setText(dt.strftime("%Y-%m-%d %H:%M:%S"))
             self._x_label.show()
             self._x_label.setPos(self._x, bottom_right.y())
             self._x_label.setAnchor((0, 0))
 
-    def update_lefttop_info(self) -> None:
-        """"""
+    def update_left_right_top_info(self, left: bool) -> None:
         buf = {}
 
         for item, plot in self._item_plot_map.items():
@@ -544,8 +584,32 @@ class ChartCursor(QtCore.QObject):
             info.show()
 
             view = self._views[plot_name]
-            top_left = view.mapSceneToView(view.sceneBoundingRect().topLeft())
-            info.setPos(top_left)
+            if left:
+                top_pos = view.mapSceneToView(view.sceneBoundingRect().topLeft())
+            else:
+                # 获取视图右上角的位置
+                top_right_scene_pos = view.sceneBoundingRect().topRight()
+                top_right_view_pos = view.mapSceneToView(top_right_scene_pos)
+
+                # 获取信息框的宽度
+                info_width = info.boundingRect().width()
+
+                # 考虑视图的缩放，计算实际需要减去的宽度
+                delta_pos = view.mapSceneToView(QtCore.QPointF(info_width, 0)) - view.mapSceneToView(
+                    QtCore.QPointF(0, 0))
+                info_width_in_view = delta_pos.x()
+
+                # 调整 x 坐标，确保信息框不会超出视图范围
+                adjusted_x = top_right_view_pos.x() - info_width_in_view
+                top_pos = QtCore.QPointF(adjusted_x, top_right_view_pos.y())
+            info.setPos(top_pos)
+
+    # def update_lefttop_info(self) -> None:
+    #     """"""
+    #     self.update_left_right_top_info(True)
+
+    # def update_righttop_info(self) -> None:
+    #     self.update_left_right_top_info(False)
 
     def move_right(self) -> None:
         """

@@ -9,8 +9,8 @@ from klinechart.chart.base import to_int
 
 from .base import BLACK_COLOR, UP_COLOR, DOWN_COLOR, PEN_WIDTH
 from .manager import BarManager
-from .object import ChartItemInfo
-from utils.user_logbook import user_log as logger
+from .object import ChartItemInfo, TIndex
+import logging
 
 
 class ChartBase(pg.GraphicsObject):
@@ -55,32 +55,45 @@ class ChartBase(pg.GraphicsObject):
         self._down_brush: QtGui.QBrush = pg.mkBrush(color=DOWN_COLOR)
 
         self._rect_area: Tuple[float, float] = None
+        self._rect_bottom_top: Tuple[float, float] = None
 
         # Very important! Only redraw the visible part and improve speed a lot.
         # self.setFlag(self.ItemUsesExtendedStyleOption)
         self._bars: Dict[datetime, DataItem] = {}
         self._discrete_list: List[DataItem] = []  # 离散数据，例如直线类，不是每个点上都有直线，也可能一个点上多个直线
         self._pens = [self._yellow_pen, self._up_pen, self._down_pen, self._magenta_pen, self._blue_pen]
+        colors_ = ["yellow", "red", "green", "magenta", "blue"]
+        self.color_to_pen = dict(zip(colors_, self._pens))
 
-    def get_index(self, dt: datetime) -> int:
+    # 定义获取笔对象的方法
+    def get_pen_by_color(self, color):
+        try:
+            return self.color_to_pen[color]
+        except KeyError:
+            return self.color_to_pen["yellow"]
+
+    def get_index(self, dt: datetime) -> TIndex:
         """
         Get index with datetime.
         """
-        return self._manager._datetime_index_map.get(dt, None)
+        return self._manager.get_index_from_dt(dt)
+        # return self._manager._datetime_index_map.get(dt, None)
 
     def get_datetime(self, ix: float) -> datetime:
         """
         Get datetime with index.
         """
-        ix = to_int(ix)
-        return self._index_datetime_map.get(ix, None)
+        # ix = to_int(ix)
+        return self._manager.get_dt_from_index(ix)
+        # return self._index_datetime_map.get(ix, None)
 
     def get_bar_from_index(self, ix: float) -> DataItem:
         """
         Get bar data with index.
         """
-        ix = to_int(ix)
-        dt = self._manager._index_datetime_map.get(ix, None)
+        # ix = to_int(ix)
+        dt = self._manager.get_dt_from_index(ix)
+        # dt = self._manager._index_datetime_map.get(ix, None)
         if not dt:
             return None
 
@@ -120,7 +133,7 @@ class ChartBase(pg.GraphicsObject):
         If min_ix and max_ix not specified, then return range with whole data set.
         """
         min_value, max_value = self._manager.get_layout_range(self._layout_index, min_ix, max_ix)
-        logger.trace("get_y_range::min_max_value:【{}，{}】".format(min_value, max_value))
+        logging.info("get_y_range::min_max_value:【{}，{}】".format(min_value, max_value))
         return min_value, max_value
 
     @abstractmethod

@@ -46,7 +46,7 @@ class ChartLine(ChartBase):
             for i in range(1, len(bar) - 1):
                 if len(self._params) >= i:
                     text += "{}:".format(self._params[i - 1])
-                text += "{}, ".format(bar[i])  # f"{(bar[i])}, "
+                text += "{:.2f}, ".format(bar[i])  # f"{(bar[i])}, "
                 if i % 2 == 0:
                     text += "\n"
             if len(self._params) >= len(bar) - 1:
