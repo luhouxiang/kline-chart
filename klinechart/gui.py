@@ -4,7 +4,7 @@ from typing import Dict
 from klinechart.chart import ChartWidget, ChartVolume, ChartCandle, ChartMacd, \
     ChartArrow, ChartLine, ChartStraight, ChartSignal, ItemIndex
 from klinechart.chart.object import PlotIndex, PlotItemInfo, ChartItemInfo
-from klinechart.trader.config import conf
+from klinechart.config import conf
 from algo.weibi import get_weibi_list
 from .app_model import AppModel
 
