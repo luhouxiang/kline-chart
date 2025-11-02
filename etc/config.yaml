@@ -23,8 +23,9 @@ plots:
     max_height: 120
     chart_item:
     -
-      file_name: ../data/MACD12.26.9.txt
-      type: Macd
+      file_name: ""
+      func_name: fn_calc_volumes
+      type: Volume
   -
     max_height: 120
     chart_item:

@@ -6,22 +6,23 @@ from klinechart.chart import ChartWidget, ChartVolume, ChartCandle, ChartMacd, \
 from klinechart.chart.object import PlotIndex, PlotItemInfo, ChartItemInfo
 from klinechart.trader.config import conf
 from algo.weibi import get_weibi_list
-from .data_loader import load_data
-from .algos import obtain_data_from_algo
+from .app_model import AppModel
 
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        # load data and initialize chart widget
-        datas: Dict[PlotIndex, PlotItemInfo] = load_data(conf)
+        # create model and load data
+        model = AppModel(conf)
+        model.load()
+        datas: Dict[PlotIndex, PlotItemInfo] = model.get_datas()
+
         widget = ChartWidget(self)
-        # update history klines from first plot/item
+        # seed manager's history klines from first plot/item
         widget.manager.update_history_klines(datas[PlotIndex(0)][ItemIndex(0)].bars.values())
-        # run algos to fill data structures
-        obtain_data_from_algo(widget.manager.klines, datas)
+        # let model run algos using manager.klines
+        model.apply_algos(widget.manager.klines)
         # prepare weibis if callbacks need them
-        weibis = get_weibi_list(widget.manager.klines)
 
         plots = conf["plots"]
         for plot_index, plot in enumerate(plots):
@@ -29,6 +30,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 axis = True
             else:
                 axis = False
+            # The `widget` in the code is an instance of `ChartWidget` being used to create a main
+            # window for a GUI application. Here is a breakdown of what `widget` is doing in the code
+            # snippet:
             widget.add_plot(hide_x_axis=axis, maximum_height=plots[plot_index]["max_height"])  # plot
             for index, chart_item in enumerate(plot["chart_item"]):
                 if chart_item["type"] == "Candle":
