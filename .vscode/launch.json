@@ -1,0 +1,41 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Run klinechart.main (pydev3.12)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/klinechart/main.py",
+      "cwd": "${workspaceFolder}/klinechart",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      // interpreterPath can point to a named interpreter if your environment resolves it,
+      // otherwise replace with absolute path to the python executable for pydev3.12.
+      "interpreterPath": "pydev3.12",
+      // ensure workspace root is on PYTHONPATH so imports like `klinechart` work
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "envFile": "${workspaceFolder}/.env",
+      "args": []
+    }
+  ]
+}
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python Debugger: Python File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}"
+        }
+    ]
+}

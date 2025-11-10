@@ -61,7 +61,7 @@ def _Cal_MERGE(combs: List[stCombineK]) -> int:
         # 高点降，低点也降，向下
         IndependentK(combs, KSide.DOWN)
     else:
-        if greater_than_0(combs[pCur].data.high - combs[pPrev].data) or \
+        if greater_than_0(combs[pCur].data.high - combs[pPrev].data.high) or \
             less_than_0(combs[pCur].data.low - combs[pPrev].data.low):
             # 高点高于前 或是 低点低于前， 右包含，向上合并
             ContainsK(combs, combs[pPrev].data.low, combs[pCur].data.high, combs[pCur].pos_begin, combs[pCur].pos_begin)

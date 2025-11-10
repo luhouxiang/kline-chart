@@ -4,7 +4,7 @@ plots:
     max_height: 0
     chart_item:
     -
-      file_name: ../data/candle.txt
+      file_name: "../data/28#SRL9.txt"
       type: Candle
     -
       file_name: "均线"
