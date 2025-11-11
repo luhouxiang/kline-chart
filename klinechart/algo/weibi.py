@@ -1,5 +1,5 @@
-from model.kline import KLine
-from model.obj import Direction
+from klinechart.model.kline import KLine
+from klinechart.model.obj import Direction
 from typing import List
 from datetime import datetime
 import math

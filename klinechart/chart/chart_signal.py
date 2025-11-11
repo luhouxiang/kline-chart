@@ -4,7 +4,7 @@ from klinechart.chart.object import DataItem
 from .chart_base import ChartBase
 from .base import BAR_WIDTH
 from .manager import BarManager
-import logging
+
 
 class ChartSignal(ChartBase):
     """

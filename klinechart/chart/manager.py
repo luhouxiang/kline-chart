@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 """K线序列数据管理工具
 """
-from typing import Dict, Tuple, List
-import numpy as np
-import pandas as pd
+from typing import Dict, Tuple
 
 from .object import PlotItemInfo, TIndex
 from .object import PlotIndex, ItemIndex, ChartItemInfo, MinMaxIdxTuple, MinMaxPriceTuple
 
 from .base import to_int
-from model.kline import KLine
+from klinechart.model import KLine
 from datetime import datetime
 import logging
 

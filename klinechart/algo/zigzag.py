@@ -2,7 +2,7 @@
 z字型算法实现,通过gpt转换，还需用数据测试和验证，修正
 """
 import numpy as np
-from model.kline import KLine
+from klinechart.model.kline import KLine
 # input parameters
 InpDepth = 12
 InpDeviation = 5

@@ -4,7 +4,7 @@ UI should interact with this model rather than directly loading files or calling
 """
 from typing import Dict
 from klinechart.chart.object import PlotIndex, PlotItemInfo
-from klinechart.config import conf
+from klinechart.run.config import conf
 from .data_loader import load_data
 from .algos import obtain_data_from_algo
 

@@ -14,7 +14,7 @@ def load_yaml(path: str):
 
 
 # Resolve config path relative to this module so imports work when the CWD varies.
-HERE = Path(__file__).resolve().parent
+HERE = Path(__file__).resolve().parent.parent
 DEFAULT_CONF = HERE.parent.joinpath('etc', 'config.yaml')
 if DEFAULT_CONF.exists():
     conf = load_yaml(str(DEFAULT_CONF))

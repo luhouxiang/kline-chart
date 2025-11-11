@@ -5,7 +5,6 @@ import pyqtgraph as pg
 
 from PySide6 import QtCore, QtGui, QtWidgets
 from klinechart.chart.object import DataItem
-from klinechart.chart.base import to_int
 
 from .base import BLACK_COLOR, UP_COLOR, DOWN_COLOR, PEN_WIDTH
 from .manager import BarManager

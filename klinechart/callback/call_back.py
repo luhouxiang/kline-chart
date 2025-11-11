@@ -5,15 +5,15 @@ Created on
 @file: call_back.py
 @desc: 由配置文件回调过程
 """
-from model.kline import KLine, KExtreme, KSide, stFxK, stCombineK, Segment, Pivot
-from algo.formula import MA
+from klinechart.model.kline import KLine, KExtreme, KSide, stFxK, stCombineK, Segment, Pivot
+from klinechart.algo.formula import MA
 from datetime import datetime
-from algo.weibi import get_weibi_list
+from klinechart.algo.weibi import get_weibi_list
 from typing import List, Dict, Any
-from model.obj import Direction
-from chanlun.c_bi import Cal_LOWER
-from chanlun.c_bi import (Cal_UPPER, cal_independent_klines, calculate_bi, _NCHDUAN, compute_bi_pivots,
-                                 compute_duan_pivots)
+from klinechart.model.obj import Direction
+from klinechart.chanlun.c_bi import Cal_LOWER
+from klinechart.chanlun.c_bi import (Cal_UPPER, cal_independent_klines, calculate_bi, _NCHDUAN, compute_bi_pivots,
+                                     compute_duan_pivots)
 import logging
 
 

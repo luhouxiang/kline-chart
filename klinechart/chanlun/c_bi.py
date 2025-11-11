@@ -7,12 +7,10 @@
 2 合并K线：2根有包含关系的K线，如果方向向下，则取其中高点中的低点作为新K线高点，取其中低点中的低点作为新K线低点，由此合并出一根新K线。
 如果方向向上，则取其中高点中的高点作为新K线高点，取其中低点中的高点作为新K线低点，由此合并出一根新K线。
 """
-from model.kline import KLine, stCombineK, KSide, stFxK, stBiK, KExtreme, Segment, Pivot
+from klinechart.model.kline import KLine, stCombineK, KSide, stFxK, stBiK, KExtreme, Segment, Pivot
 from typing import List, Optional, Union
-from chanlun.float_compare import *
+from klinechart.chanlun.float_compare import *
 import copy
-import logging
-from datetime import datetime
 from typing import Tuple, Dict
 
 

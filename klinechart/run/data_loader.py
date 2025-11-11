@@ -1,7 +1,7 @@
 """Data loading utilities extracted from main to keep concerns separated."""
 from typing import Dict, List
 import logging
-from utils import file_txt
+from klinechart.myutils import file_txt
 from klinechart.chart.object import ChartItemInfo, PlotIndex, ItemIndex, BarDict, DataItem
 from pathlib import Path
 import os

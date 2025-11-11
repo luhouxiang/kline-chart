@@ -3,9 +3,8 @@ from PySide6 import QtWidgets
 from typing import Dict
 from klinechart.chart import ChartWidget, ChartVolume, ChartCandle, ChartMacd, \
     ChartArrow, ChartLine, ChartStraight, ChartSignal, ItemIndex
-from klinechart.chart.object import PlotIndex, PlotItemInfo, ChartItemInfo
-from klinechart.config import conf
-from algo.weibi import get_weibi_list
+from klinechart.chart.object import PlotIndex, PlotItemInfo
+from klinechart.run.config import conf
 from .app_model import AppModel
 
 

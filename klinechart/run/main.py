@@ -13,7 +13,7 @@ sys.path.append(work_dir)
 def main():
     """Thin entrypoint: construct QApplication and show main window from gui module."""
     app = QtWidgets.QApplication(sys.argv)
-    from klinechart.gui import MainWindow
+    from klinechart.run.gui import MainWindow
     w = MainWindow()
     w.resize(1024, 768)
     w.show()

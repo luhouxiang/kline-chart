@@ -3,10 +3,10 @@
 This module isolates algorithm-related processing so UI code doesn't directly call algos.
 """
 from typing import Dict, List
-from klinechart.chart import PlotIndex, PlotItemInfo, ChartItemInfo, ItemIndex
-from model.kline import KLine
-import callback.call_back as cb
-from algo.zigzag import OnCalculate
+from klinechart.chart import PlotIndex, PlotItemInfo, ChartItemInfo
+from klinechart.model import KLine
+import klinechart.callback.call_back as cb
+from klinechart.algo.zigzag import OnCalculate
 
 
 def calc_zig_zag(klines: List[KLine]):

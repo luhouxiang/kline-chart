@@ -8,7 +8,7 @@
       "name": "Python: Run klinechart.main (pydev3.12)",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/klinechart/main.py",
+      "program": "${workspaceFolder}/klinechart/run/main.py",
       "cwd": "${workspaceFolder}/klinechart",
       "console": "integratedTerminal",
       "justMyCode": true,
