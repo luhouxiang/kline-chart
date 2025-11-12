@@ -187,15 +187,12 @@ def fn_calc_duan_pivot(klines: list[KLine]) -> List[Pivot]:
     for w in pivots:
         s_dt = datetime.fromtimestamp(klines[w.bg_pos_index].time)
         e_dt = datetime.fromtimestamp(klines[w.ed_pos_index].time)
-        # if w.up:
-        #     color = "red"
-        # else:
-        #     color = "green"
         color = "yellow"
-        items.append([s_dt, w.lowly_value, e_dt, w.lowly_value, 0, color])
-        items.append([s_dt, w.highly_value, e_dt, w.highly_value, 0, color])
-        items.append([s_dt, w.lowly_value, s_dt, w.highly_value, 0, color])
-        items.append([e_dt, w.lowly_value, e_dt, w.highly_value, 0, color])
+        width = 2.0  # make duan pivot box a bit thicker
+        items.append([s_dt, w.lowly_value, e_dt, w.lowly_value, 0, color, width])
+        items.append([s_dt, w.highly_value, e_dt, w.highly_value, 0, color, width])
+        items.append([s_dt, w.lowly_value, s_dt, w.highly_value, 0, color, width])
+        items.append([e_dt, w.lowly_value, e_dt, w.highly_value, 0, color, width])
     return items
 
 
