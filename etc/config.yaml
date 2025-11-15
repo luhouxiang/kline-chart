@@ -35,8 +35,8 @@ plots:
     chart_item:
     -
       file_name: ""
-      func_name: fn_calc_volumes
-      type: Volume
+      func_name: fn_calc_macd
+      type: Macd
   -
     max_height: 120
     chart_item:

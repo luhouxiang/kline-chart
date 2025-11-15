@@ -30,27 +30,15 @@ class ChartBase(pg.GraphicsObject):
 
         self._black_brush: QtGui.QBrush = pg.mkBrush(color=BLACK_COLOR)
 
-        self._up_pen: QtGui.QPen = pg.mkPen(
-            color=UP_COLOR, width=PEN_WIDTH
-        )
-
-        self._yellow_pen: QtGui.QPen = pg.mkPen(
-            color="yellow", width=PEN_WIDTH
-        )
-
-        self._blue_pen: QtGui.QPen = pg.mkPen(
-            color="blue", width=PEN_WIDTH
-        )
-        self._magenta_pen: QtGui.QPen = pg.mkPen(
-            color="magenta", width=PEN_WIDTH
-        )
+        self._up_pen: QtGui.QPen = self._make_pen(UP_COLOR)
+        self._yellow_pen: QtGui.QPen = self._make_pen("yellow")
+        self._blue_pen: QtGui.QPen = self._make_pen("blue")
+        self._magenta_pen: QtGui.QPen = self._make_pen("magenta")
 
         self._up_brush: QtGui.QBrush = pg.mkBrush(color=UP_COLOR)
         self._yellow_brush: QtGui.QBrush = pg.mkBrush(color="yellow")
 
-        self._down_pen: QtGui.QPen = pg.mkPen(
-            color=DOWN_COLOR, width=PEN_WIDTH
-        )
+        self._down_pen: QtGui.QPen = self._make_pen(DOWN_COLOR)
         self._down_brush: QtGui.QBrush = pg.mkBrush(color=DOWN_COLOR)
 
         self._rect_area: Tuple[float, float] = None
@@ -63,6 +51,12 @@ class ChartBase(pg.GraphicsObject):
         self._pens = [self._yellow_pen, self._up_pen, self._down_pen, self._magenta_pen, self._blue_pen]
         colors_ = ["yellow", "red", "green", "magenta", "blue"]
         self.color_to_pen = dict(zip(colors_, self._pens))
+
+    def _make_pen(self, color) -> QtGui.QPen:
+        pen = pg.mkPen(color=color, width=PEN_WIDTH)
+        pen.setCapStyle(QtCore.Qt.RoundCap)
+        pen.setJoinStyle(QtCore.Qt.RoundJoin)
+        return pen
 
     # 定义获取笔对象的方法
     def get_pen_by_color(self, color):

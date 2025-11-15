@@ -18,6 +18,7 @@ class ChartMacd(ChartBase):
         # Create objects
         volume_picture = QtGui.QPicture()
         painter = QtGui.QPainter(volume_picture)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
 
         # Set painter color
         if bar[1] >= 0:
@@ -36,13 +37,14 @@ class ChartMacd(ChartBase):
         )
         painter.drawRect(rect)
 
+        prev_bar = old_bar if old_bar else bar
         painter.setPen(self._magenta_pen)
-        line = QtCore.QLine(ix - 1, old_bar[2], ix, bar[2])
-        painter.drawLine(line)
+        dif_line = QtCore.QLineF(ix - 1, prev_bar[2], ix, bar[2])
+        painter.drawLine(dif_line)
 
         painter.setPen(self._yellow_pen)
-        line = QtCore.QLine(ix - 1, old_bar[3], ix, bar[3])
-        painter.drawLine(line)
+        dea_line = QtCore.QLineF(ix - 1, prev_bar[3], ix, bar[3])
+        painter.drawLine(dea_line)
 
         # Finish
         painter.end()

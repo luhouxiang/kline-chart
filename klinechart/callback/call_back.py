@@ -60,6 +60,42 @@ def fn_calc_volumes(klines: list[KLine]):
     return bars
 
 
+def fn_calc_macd(klines: List[KLine], short_period: int = 12, long_period: int = 26, signal_period: int = 9):
+    """回调计算MACD指标，用于在中间区域绘制MACD图"""
+    bars = {}
+    if not klines:
+        return bars
+
+    short_alpha = 2 / (short_period + 1)
+    long_alpha = 2 / (long_period + 1)
+    signal_alpha = 2 / (signal_period + 1)
+
+    short_ema = None
+    long_ema = None
+    dea = None
+
+    for k in klines:
+        close_price = k.close
+        if short_ema is None:
+            short_ema = close_price
+            long_ema = close_price
+        else:
+            short_ema = (close_price - short_ema) * short_alpha + short_ema
+            long_ema = (close_price - long_ema) * long_alpha + long_ema
+
+        dif = short_ema - long_ema
+        if dea is None:
+            dea = dif
+        else:
+            dea = (dif - dea) * signal_alpha + dea
+
+        macd = 2 * (dif - dea)
+        dt = datetime.fromtimestamp(k.time)
+        bars[dt] = [dt, macd, dif, dea]
+
+    return bars
+
+
 def fn_calc_up_lower_upper(klines: List[KLine]):
     lower = Cal_LOWER(klines, 0, len(klines)-1)
     upper = Cal_UPPER(klines, 0, len(klines)-1)
