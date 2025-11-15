@@ -1,7 +1,7 @@
 data_window:
-  start: "2025-01-15 21:05"
-  end: "2025-10-15 21:05"
-  count: 100
+  start: "2025-08-15 21:05"
+  end: "2025-11-17 23:00"
+  count: 0
 plots:
   # type类型： Line：线段，两个端点的， Straight:直线， Candle:表示K线， Curve：曲线，例MA5
   -

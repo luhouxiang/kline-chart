@@ -129,24 +129,24 @@ def _normalize_count(value) -> Optional[int]:
     return count if count > 0 else None
 
 
-def _select_datetimes(sorted_dts: List[datetime],
+def _select_datetimes(ordered_dts: List[datetime],
                       start_dt: Optional[datetime],
                       end_dt: Optional[datetime],
                       count: Optional[int]) -> List[datetime]:
-    if not sorted_dts:
+    if not ordered_dts:
         return []
 
-    total = len(sorted_dts)
+    total = len(ordered_dts)
 
     def first_ge(target: datetime) -> int:
-        for idx, dt in enumerate(sorted_dts):
+        for idx, dt in enumerate(ordered_dts):
             if dt >= target:
                 return idx
         return total
 
     def last_le(target: datetime) -> int:
         for idx in range(total - 1, -1, -1):
-            if sorted_dts[idx] <= target:
+            if ordered_dts[idx] <= target:
                 return idx
         return -1
 
@@ -155,15 +155,15 @@ def _select_datetimes(sorted_dts: List[datetime],
         right = last_le(end_dt)
         if left >= total or right < 0 or right < left:
             return []
-        return sorted_dts[left:right + 1]
+        return ordered_dts[left:right + 1]
 
     if start_dt:
         left = first_ge(start_dt)
         if left >= total:
             return []
         if count:
-            return sorted_dts[left: left + count]
-        return sorted_dts[left:]
+            return ordered_dts[left: left + count]
+        return ordered_dts[left:]
 
     if end_dt:
         right = last_le(end_dt)
@@ -171,13 +171,13 @@ def _select_datetimes(sorted_dts: List[datetime],
             return []
         if count:
             start = max(0, right - count + 1)
-            return sorted_dts[start: right + 1]
-        return sorted_dts[: right + 1]
+            return ordered_dts[start: right + 1]
+        return ordered_dts[: right + 1]
 
     if count:
-        return sorted_dts[-count:]
+        return ordered_dts[-count:]
 
-    return sorted_dts[:]
+    return ordered_dts[:]
 
 
 def _apply_data_window(local_data: Dict[PlotIndex, Dict[ItemIndex, ChartItemInfo]],
@@ -195,14 +195,13 @@ def _apply_data_window(local_data: Dict[PlotIndex, Dict[ItemIndex, ChartItemInfo
     end_dt = _parse_window_datetime(window_cfg.get("end"))
     count = _normalize_count(window_cfg.get("count"))
 
-    base_datetimes = sorted(first_item.bars.keys())
+    base_datetimes = list(first_item.bars.keys())
     selected = _select_datetimes(base_datetimes, start_dt, end_dt, count)
 
     if not selected:
         logging.warning("data_window produced no candles; keeping original data set.")
         return
 
-    selected_set = set(selected)
     for plot_info in local_data.values():
         for info in plot_info.values():
             if not info.bars:
