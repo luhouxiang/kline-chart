@@ -1,5 +1,5 @@
 """Data loading utilities extracted from main to keep concerns separated."""
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import logging
 from klinechart.myutils import file_txt
 from klinechart.chart.object import ChartItemInfo, PlotIndex, ItemIndex, BarDict, DataItem
@@ -59,6 +59,39 @@ def calc_bars(data_list, data_type: List[str]) -> BarDict:
     return bar_dict
 
 
+def extract_file_metadata(file_path: str) -> Tuple[str, str, str]:
+    """Read the first descriptive line of a data file to capture symbol/name/period."""
+    symbol = ""
+    name = ""
+    period = ""
+
+    if not file_path or not os.path.exists(file_path):
+        return symbol, name, period
+
+    try:
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            for raw in f:
+                line = raw.strip()
+                if not line:
+                    continue
+                # skip if line looks like data (starts with digit) or like CSV header
+                if line[0].isdigit() or ',' in line:
+                    break
+                tokens = line.replace('\t', ' ').split()
+                if not tokens:
+                    continue
+                symbol = tokens[0]
+                if len(tokens) > 1:
+                    name = tokens[1]
+                if len(tokens) > 2:
+                    period = tokens[2]
+                break
+    except Exception:
+        logging.debug("Failed parsing metadata from %s", file_path)
+
+    return symbol, name, period
+
+
 def load_data(conf: Dict[str, any]) -> Dict[PlotIndex, Dict[ItemIndex, ChartItemInfo]]:
     """
     Load files described in config and return a mapping PlotIndex -> (ItemIndex -> ChartItemInfo)
@@ -93,6 +126,11 @@ def load_data(conf: Dict[str, any]) -> Dict[PlotIndex, Dict[ItemIndex, ChartItem
 
             data_list = file_txt.read_file(data_path)
             bar_dict: BarDict = calc_bars(data_list, item_info.data_type)
+            if item_info.type == "Candle":
+                symbol, name, period = extract_file_metadata(data_path)
+                item_info.symbol_code = symbol
+                item_info.symbol_name = name
+                item_info.symbol_period = period
             item_info.bars = bar_dict
             plot_info[ItemIndex(item_index)] = item_info
             logging.info(f"file_name: {item['file_name']}")

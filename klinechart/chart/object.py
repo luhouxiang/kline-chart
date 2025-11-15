@@ -123,6 +123,9 @@ class ChartItemInfo:
         self.func_name: str = ""    # 获取数据的函数名
         self.data_type: List[str] = []
         self.max_height: int = 0
+        self.symbol_code: str = ""
+        self.symbol_name: str = ""
+        self.symbol_period: str = ""
 
 
 PlotIndex = NewType('PlotIndex', int)

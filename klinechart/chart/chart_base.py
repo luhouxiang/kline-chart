@@ -32,7 +32,8 @@ class ChartBase(pg.GraphicsObject):
 
         self._up_pen: QtGui.QPen = self._make_pen(UP_COLOR)
         self._yellow_pen: QtGui.QPen = self._make_pen("yellow")
-        self._blue_pen: QtGui.QPen = self._make_pen("blue")
+        self._blue_pen: QtGui.QPen = self._make_pen
+        ("blue")
         self._magenta_pen: QtGui.QPen = self._make_pen("magenta")
 
         self._up_brush: QtGui.QBrush = pg.mkBrush(color=UP_COLOR)
@@ -51,6 +52,9 @@ class ChartBase(pg.GraphicsObject):
         self._pens = [self._yellow_pen, self._up_pen, self._down_pen, self._magenta_pen, self._blue_pen]
         colors_ = ["yellow", "red", "green", "magenta", "blue"]
         self.color_to_pen = dict(zip(colors_, self._pens))
+        self._symbol_code: str = ""
+        self._symbol_name: str = ""
+        self._symbol_period: str = ""
 
     def _make_pen(self, color) -> QtGui.QPen:
         pen = pg.mkPen(color=color, width=PEN_WIDTH)
@@ -141,6 +145,9 @@ class ChartBase(pg.GraphicsObject):
         self._bars = info.bars
         self._type = info.type
         self._params = info.params
+        self._symbol_code = getattr(info, "symbol_code", "")
+        self._symbol_name = getattr(info, "symbol_name", "")
+        self._symbol_period = getattr(info, "symbol_period", "")
 
         for ix in range(len(self._manager._datetime_index_map)):
             self._bar_picutures[ix] = None
