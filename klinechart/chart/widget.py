@@ -339,6 +339,7 @@ class ChartWidget(pg.PlotWidget):
 
         self._update_x_range()
         self._cursor.move_left()
+        self._cursor.reopen_info_panels()
         self._cursor.update_lefttop_info()
 
     def _on_key_right(self) -> None:
@@ -350,6 +351,7 @@ class ChartWidget(pg.PlotWidget):
 
         self._update_x_range()
         self._cursor.move_right()
+        self._cursor.reopen_info_panels()
         self._cursor.update_lefttop_info()
 
     def _on_key_down(self) -> None:
@@ -407,6 +409,9 @@ class ChartCursor(QtCore.QObject):
         self._plot_name: int = 0
 
         self._infos: Dict[int, pg.TextItem] = {}
+        self._info_closed: Dict[int, bool] = {}
+        self._info_header_height = 20
+        self._info_close_width = 24
 
         self._v_lines: Dict[str, pg.InfiniteLine] = {}
         self._h_lines: Dict[str, pg.InfiniteLine] = {}
@@ -468,17 +473,12 @@ class ChartCursor(QtCore.QObject):
         """
         for index, plot in enumerate(self._plots):
             plot_name = index
-            info = pg.TextItem(
-                "info",
-                color=CURSOR_COLOR,
-                border=CURSOR_COLOR,
-                fill=BLACK_COLOR
-            )
-            info.hide()
-            info.setZValue(2)
-            info.setFont(NORMAL_FONT)
-            plot.addItem(info)  # , ignoreBounds=True)
-            self._infos[plot_name] = info
+            info_item = pg.TextItem("", anchor=(0, 0))
+            info_item.hide()
+            info_item.setZValue(3)
+            plot.addItem(info_item)
+            self._infos[plot_name] = info_item
+            self._info_closed[plot_name] = False
 
     def _connect_signal(self) -> None:
         """
@@ -578,30 +578,39 @@ class ChartCursor(QtCore.QObject):
         for index, plot in enumerate(self._plots):
             plot_name = index
             plot_info_text = buf[plot]
-            info = self._infos[plot_name]
-            info.setText(plot_info_text)
-            info.show()
+            info_item = self._infos[plot_name]
+
+            if self._info_closed.get(plot_name):
+                info_item.hide()
+                continue
+
+            if not plot_info_text:
+                info_item.hide()
+                continue
+
+            lines = (plot_info_text or "").splitlines()
+            if lines:
+                body_text = "\n".join(lines[1:]) or ""
+            else:
+                body_text = plot_info_text
+            title_text = self._get_plot_title(plot_name)
+            html = self._format_info_html(title_text, body_text)
+            info_item.setHtml(html)
+            info_item.show()
 
             view = self._views[plot_name]
             if left:
                 top_pos = view.mapSceneToView(view.sceneBoundingRect().topLeft())
             else:
-                # 获取视图右上角的位置
                 top_right_scene_pos = view.sceneBoundingRect().topRight()
                 top_right_view_pos = view.mapSceneToView(top_right_scene_pos)
-
-                # 获取信息框的宽度
-                info_width = info.boundingRect().width()
-
-                # 考虑视图的缩放，计算实际需要减去的宽度
+                info_width = info_item.boundingRect().width()
                 delta_pos = view.mapSceneToView(QtCore.QPointF(info_width, 0)) - view.mapSceneToView(
                     QtCore.QPointF(0, 0))
                 info_width_in_view = delta_pos.x()
-
-                # 调整 x 坐标，确保信息框不会超出视图范围
                 adjusted_x = top_right_view_pos.x() - info_width_in_view
                 top_pos = QtCore.QPointF(adjusted_x, top_right_view_pos.y())
-            info.setPos(top_pos)
+            info_item.setPos(top_pos)
 
     # def update_lefttop_info(self) -> None:
     #     """"""
@@ -659,6 +668,70 @@ class ChartCursor(QtCore.QObject):
         for label in list(self._y_labels.values()) + [self._x_label]:
             label.hide()
 
-        for info in self._infos.values():
-            info.hide()
-            info.setText("")
+        for info_item in self._infos.values():
+            info_item.hide()
+            info_item.setHtml("")
+        for key in self._info_closed:
+            self._info_closed[key] = False
+
+    def _get_plot_title(self, plot_index: int) -> str:
+        title_parts = []
+        plot = self._plots[plot_index]
+        for item, mapped_plot in self._item_plot_map.items():
+            if mapped_plot is plot:
+                code = getattr(item, "_symbol_code", "") or getattr(item, "_symbol_name", "")
+                period = getattr(item, "_symbol_period", "")
+                if code:
+                    title_parts.append(str(code))
+                if period:
+                    title_parts.append(str(period))
+                break
+        if not title_parts:
+            return "信息"
+        return ":".join(title_parts)
+
+    def _format_info_html(self, title: str, body: str) -> str:
+        safe_title = title or "信息"
+        body_html = "<br>".join((body or "").splitlines())
+        return (
+            "<div style='border:1px solid #ffffff;border-radius:6px;"
+            "background:#ffffff;padding:1px;'>"
+            "<div style='border:1px solid #555;border-radius:5px;"
+            "background:#101010;color:#f5f5f5;font-size:11px;"
+            "box-shadow:0 2px 6px rgba(0,0,0,0.55);'>"
+            f"<div style='background:#8b0000;padding:4px 10px;font-weight:bold;"
+            "color:#ffffff;display:flex;justify-content:space-between;'>"
+            f"<span>{safe_title}</span><span>×</span></div>"
+            f"<div style='padding:8px;background:#1a1a1a;'>"
+            f"{body_html}</div>"
+            "</div></div>"
+        )
+
+    def _close_info_panel(self, plot_index: int) -> None:
+        self._info_closed[plot_index] = True
+        info_item = self._infos.get(plot_index)
+        if info_item:
+            info_item.hide()
+
+    def reopen_info_panels(self) -> None:
+        for key in self._info_closed:
+            self._info_closed[key] = False
+
+    def _handle_scene_click(self, event) -> None:
+        if not self._manager.get_count():
+            return
+        scene_pos = event.scenePos()
+        for plot_name, info_item in self._infos.items():
+            if not info_item.isVisible():
+                continue
+            local_pos = info_item.mapFromScene(scene_pos)
+            rect = info_item.boundingRect()
+            if not rect.contains(local_pos):
+                continue
+            if 0 <= local_pos.y() <= self._info_header_height and \
+                    rect.width() - self._info_close_width <= local_pos.x() <= rect.width():
+                info_item.hide()
+                info_item.setHtml("")
+                self._info_closed[plot_name] = True
+                event.accept()
+                break
