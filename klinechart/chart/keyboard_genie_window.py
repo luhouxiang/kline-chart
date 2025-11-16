@@ -14,25 +14,77 @@ class KeyboardGenieWindow(QtWidgets.QWidget):
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
 
         layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(5, 5, 5, 5)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(2)
+        self.setFixedWidth(260)
 
         header_layout = QtWidgets.QHBoxLayout()
+        header_layout.setContentsMargins(4, 2, 4, 0)
+        title_label = QtWidgets.QLabel("kline-chart 键盘精灵")
+        title_label.setStyleSheet("font-weight: bold; color: #333333;")
+        header_layout.addWidget(title_label)
         header_layout.addStretch()
         self.close_button = QtWidgets.QPushButton("×")
-        self.close_button.setFixedSize(18, 18)
+        self.close_button.setFixedSize(24, 24)
+        self.close_button.setStyleSheet(
+            """
+            QPushButton {
+                border: none;
+                font-size: 18px;
+                font-weight: bold;
+                color: #555555;
+            }
+            QPushButton:hover {
+                color: #d9534f;
+            }
+            """
+        )
         self.close_button.setToolTip("关闭键盘精灵")
         self.close_button.clicked.connect(self._close_window)
         header_layout.addWidget(self.close_button)
         layout.addLayout(header_layout)
 
+        content_frame = QtWidgets.QFrame()
+        content_frame.setFrameShape(QtWidgets.QFrame.Panel)
+        content_frame.setFrameShadow(QtWidgets.QFrame.Sunken)
+        content_frame.setStyleSheet(
+            """
+            QFrame {
+                border: 1px solid #b8b8b8;
+                border-radius: 4px;
+                background: #ffffff;
+            }
+            """
+        )
+        content_layout = QtWidgets.QVBoxLayout(content_frame)
+        content_layout.setContentsMargins(0, 0, 0, 4)
+        content_layout.setSpacing(4)
+
         self.input_line_edit = QtWidgets.QLineEdit()
         self.input_line_edit.setPlaceholderText("请输入股票代码或名称")
-        layout.addWidget(self.input_line_edit)
+        self.input_line_edit.setStyleSheet(
+            """
+            QLineEdit {
+                border: 1px solid #c0c0c0;
+                border-radius: 3px;
+                padding: 5px;
+                background: #f9f9fb;
+            }
+            """
+        )
+        content_layout.addWidget(self.input_line_edit)
 
         self.matching_list_widget = QtWidgets.QListWidget()
+        self.matching_list_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.matching_list_widget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.matching_list_widget.setStyleSheet(
             """
+            QListWidget {
+                border: 1px solid #c0c0c0;
+                border-radius: 3px;
+                background: #ffffff;
+                padding: 2px;
+            }
             QListWidget::item:selected {
                 background-color: #4A90E2;
                 color: white;
@@ -46,7 +98,8 @@ class KeyboardGenieWindow(QtWidgets.QWidget):
             }
             """
         )
-        layout.addWidget(self.matching_list_widget)
+        content_layout.addWidget(self.matching_list_widget)
+        layout.addWidget(content_frame)
         self.matching_list_widget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.matching_list_widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
@@ -55,7 +108,7 @@ class KeyboardGenieWindow(QtWidgets.QWidget):
         item_height = self.matching_list_widget.sizeHintForRow(0)
         self.matching_list_widget.clear()
 
-        visible_row_count = 6
+        visible_row_count = 12
         self.matching_list_widget.setFixedHeight(item_height * visible_row_count)
 
         self.setLayout(layout)
@@ -92,15 +145,10 @@ class KeyboardGenieWindow(QtWidgets.QWidget):
                     return True
         elif event.type() in (QtCore.QEvent.MouseButtonPress, QtCore.QEvent.MouseButtonDblClick):
             if self.isVisible():
-                widget = QtWidgets.QApplication.widgetAt(event.globalPos())
-                if not widget or not (widget is self or self.isAncestorOf(widget)):
-                    if isinstance(event, QtGui.QMouseEvent):
-                        if event.button() in (QtCore.Qt.LeftButton, QtCore.Qt.RightButton):
-                            self._close_window()
-                            return False
-                    else:
-                        self._close_window()
-                        return False
+                local_pos = self.mapFromGlobal(event.globalPos())
+                if not self.rect().contains(local_pos):
+                    self._close_window()
+                    return False
         return super().eventFilter(obj, event)
 
     def focusOutEvent(self, event):

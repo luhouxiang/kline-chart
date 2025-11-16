@@ -76,8 +76,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def _show_keyboard_window(self, initial_text: str) -> None:
         if not self.keyboard_window:
             return
-        self._position_keyboard_window()
         self.keyboard_window.input_line_edit.setText(initial_text)
+        self.keyboard_window.adjustSize()
+        self._position_keyboard_window()
         self.keyboard_window.show()
         self.keyboard_window.raise_()
         self.keyboard_window.activateWindow()
@@ -92,8 +93,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if size.width() == 0 or size.height() == 0:
             size = self.keyboard_window.sizeHint()
         bottom_right = top_left + QtCore.QPoint(self.width(), self.height())
-        x = bottom_right.x() - size.width()
-        y = bottom_right.y() - size.height()
+        offset = 5
+        x = bottom_right.x() - size.width() - offset
+        y = bottom_right.y() - size.height() - offset
         min_x = top_left.x()
         min_y = top_left.y()
         max_x = bottom_right.x() - size.width()

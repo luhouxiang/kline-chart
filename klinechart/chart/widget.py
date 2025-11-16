@@ -406,7 +406,7 @@ class ChartCursor(QtCore.QObject):
         self._y: int = 0
         self._plot_name: int = 0
 
-        self._infos: Dict[str, pg.TextItem] = {}
+        self._infos: Dict[int, pg.TextItem] = {}
 
         self._v_lines: Dict[str, pg.InfiniteLine] = {}
         self._h_lines: Dict[str, pg.InfiniteLine] = {}
@@ -414,7 +414,6 @@ class ChartCursor(QtCore.QObject):
 
         self._y_labels: Dict[int, pg.TextItem] = {}
         self._x_label: pg.TextItem = None
-
         self._init_ui()
         self._connect_signal()
 
@@ -514,21 +513,8 @@ class ChartCursor(QtCore.QObject):
         self.update_lefttop_info()
 
     def update_lefttop_info(self):
-        # self.update_lefttop_info()
-        # Call the appropriate method based on mouse x position in main window
-        # Get the main window
-        # main_window = self.window()
-        main_window = self.main_window
-        # Get global mouse position
-        global_pos = QtGui.QCursor.pos()
-        # Map global position to main window coordinate system
-        main_pos = main_window.mapFromGlobal(global_pos)
-        # Determine the center x coordinate of the main window
-        center_x = main_window.width() / 2
-        if main_pos.x() < center_x:
-            self.update_left_right_top_info(False)
-        else:
-            self.update_left_right_top_info(True)
+        """Always render info panels anchored to the left for consistency."""
+        self.update_left_right_top_info(True)
 
     def _update_line(self) -> None:
         """"""
