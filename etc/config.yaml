@@ -15,21 +15,21 @@ plots:
       type: Line
       params: ["MA20", "MA60"]
       func_name: fn_calc_ma20_60
-    # -
-    #   file_name: "微笔"
-    #   type: Straight
-    #   params: []
-    #   func_name: fn_calc_bi
-    # -
-    #   file_name: ""
-    #   func_name: fn_calc_seg
-    #   params: []
-    #   type: Straight
-    # -
-    #   file_name: ""
-    #   func_name: fn_calc_bi_pivot
-    #   params: []
-    #   type: Straight
+    -
+      file_name: "笔"
+      type: Straight
+      params: []
+      func_name: fn_calc_bi
+    -
+      file_name: ""
+      func_name: fn_calc_seg
+      params: []
+      type: Straight
+    -
+      file_name: ""
+      func_name: fn_calc_bi_pivot
+      params: []
+      type: Straight
     # - file_name: ""
     #   func_name: fn_calc_duan_pivot
     #   params: []

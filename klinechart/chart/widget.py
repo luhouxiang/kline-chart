@@ -36,7 +36,7 @@ class ChartWidget(pg.PlotWidget):
     def __init__(self, parent: QtWidgets.QWidget = None):
         """"""
         super().__init__(parent)
-        self.main_window = parent.window()
+        self.main_window = parent.window() if parent else None
         self.manager: BarManager = BarManager()
 
         self._plots: List[pg.PlotItem] = []
@@ -181,13 +181,15 @@ class ChartWidget(pg.PlotWidget):
         Clear all data.
         """
         self.manager.clear_all()
+        self._right_ix = 0
+        self._bar_count = self.NORMAL_BAR_COUNT
 
-        # for items in self._plot_charts_dict.values():
-        #     for item in items:
-        #         item.clear_all()
-        #
-        # if self._cursor:
-        #     self._cursor.clear_all()
+        for items in self._plot_charts_dict.values():
+            for item in items:
+                item.clear_all()
+
+        if self._cursor:
+            self._cursor.clear_all()
 
 
     # def update_history(self, history: List[BarData]) -> None:
@@ -296,6 +298,17 @@ class ChartWidget(pg.PlotWidget):
         """
         Reimplement this method of parent to move chart horizontally and zoom in/out.
         """
+        if (
+            self.main_window
+            and hasattr(self.main_window, "_forward_key_to_keyboard_window")
+            and self.main_window._forward_key_to_keyboard_window(event)
+        ):
+            return
+        if self.main_window and hasattr(self.main_window, "handle_symbol_search_key"):
+            text = event.text()
+            if text and self.main_window.handle_symbol_search_key(text):
+                return
+
         if event.key() == QtCore.Qt.Key_Left:
             self._on_key_left()
         elif event.key() == QtCore.Qt.Key_Right:
@@ -659,3 +672,7 @@ class ChartCursor(QtCore.QObject):
 
         for label in list(self._y_labels.values()) + [self._x_label]:
             label.hide()
+
+        for info in self._infos.values():
+            info.hide()
+            info.setText("")

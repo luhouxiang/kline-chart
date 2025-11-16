@@ -25,7 +25,7 @@ def fn_calc_ma20_60(klines: list[KLine]):
         dt = datetime.fromtimestamp(k.time)
         MA20.input(k.close)
         MA60.input(k.close)
-        bars[dt] = [dt, MA20.ma, MA60.ma]
+        bars[dt] = [dt, MA20.ma]
     return bars
 
 
