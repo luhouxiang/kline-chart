@@ -20,11 +20,11 @@ plots:
       type: Straight
       params: []
       func_name: fn_calc_bi
-    -
-      file_name: ""
-      func_name: fn_calc_seg
-      params: []
-      type: Straight
+    # -
+    #   file_name: ""
+    #   func_name: fn_calc_seg
+    #   params: []
+    #   type: Straight
     -
       file_name: ""
       func_name: fn_calc_bi_pivot

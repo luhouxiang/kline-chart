@@ -1,4 +1,4 @@
-from PySide6 import QtWidgets, QtCore
+from PySide6 import QtWidgets, QtCore, QtGui
 
 
 class KeyboardGenieWindow(QtWidgets.QWidget):
@@ -63,6 +63,9 @@ class KeyboardGenieWindow(QtWidgets.QWidget):
 
         self.installEventFilter(self)
         self.input_line_edit.installEventFilter(self)
+        app = QtWidgets.QApplication.instance()
+        if app:
+            app.installEventFilter(self)
 
         self.input_line_edit.textChanged.connect(self.on_input_text_changed)
         self.input_line_edit.returnPressed.connect(self.on_return_pressed)
@@ -87,6 +90,17 @@ class KeyboardGenieWindow(QtWidgets.QWidget):
                 if not self.input_line_edit.text():
                     self._close_window()
                     return True
+        elif event.type() in (QtCore.QEvent.MouseButtonPress, QtCore.QEvent.MouseButtonDblClick):
+            if self.isVisible():
+                widget = QtWidgets.QApplication.widgetAt(event.globalPos())
+                if not widget or not (widget is self or self.isAncestorOf(widget)):
+                    if isinstance(event, QtGui.QMouseEvent):
+                        if event.button() in (QtCore.Qt.LeftButton, QtCore.Qt.RightButton):
+                            self._close_window()
+                            return False
+                    else:
+                        self._close_window()
+                        return False
         return super().eventFilter(obj, event)
 
     def focusOutEvent(self, event):

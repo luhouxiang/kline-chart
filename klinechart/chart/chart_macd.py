@@ -1,7 +1,6 @@
 from PySide6 import QtCore, QtGui
 from klinechart.chart.object import DataItem
 from .chart_base import ChartBase
-from .base import BAR_WIDTH
 from .manager import BarManager
 
 
@@ -20,22 +19,15 @@ class ChartMacd(ChartBase):
         painter = QtGui.QPainter(volume_picture)
         painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
 
-        # Set painter color
-        if bar[1] >= 0:
-            painter.setPen(self._up_pen)
-            painter.setBrush(self._up_brush)
-        else:
-            painter.setPen(self._down_pen)
-            painter.setBrush(self._down_brush)
-
-        # Draw volume body
-        rect = QtCore.QRectF(
-            ix - BAR_WIDTH,
-            0,
-            BAR_WIDTH * 2,
-            bar[1]
+        # Draw histogram as a thin vertical line from zero to MACD value
+        histogram_value = bar[1] if bar else 0
+        histogram_pen = QtGui.QPen(self._up_pen if histogram_value >= 0 else self._down_pen)
+        histogram_pen.setWidthF(1)
+        painter.setPen(histogram_pen)
+        painter.drawLine(
+            QtCore.QPointF(ix, 0),
+            QtCore.QPointF(ix, histogram_value)
         )
-        painter.drawRect(rect)
 
         prev_bar = old_bar if old_bar else bar
         painter.setPen(self._magenta_pen)
