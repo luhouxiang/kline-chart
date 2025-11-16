@@ -13,7 +13,7 @@ plots:
     -
       file_name: "均线"
       type: Line
-      params: ["MA20", "MA60"]
+      params: ["MA20:red", "MA60"]
       func_name: fn_calc_ma20_60
     -
       file_name: "笔"

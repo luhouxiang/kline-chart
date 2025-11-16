@@ -49,7 +49,7 @@ class ChartMacd(ChartBase):
         bar = self.get_bar_from_index(ix)
 
         if bar:
-            text = f"macd:{bar[1]},dif:{bar[2]},dea:{bar[3]}"
+            text = f"macd:{bar[1]:.2f},dif:{bar[2]:.2f},dea:{bar[3]:.2f}"
         else:
             text = ""
 
