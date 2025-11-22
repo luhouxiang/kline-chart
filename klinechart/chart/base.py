@@ -1,4 +1,6 @@
 from PySide6 import QtGui
+from PySide6.QtGui import QColor
+from PySide6.QtGui import QColorConstants
 
 
 WHITE_COLOR = (255, 255, 255)

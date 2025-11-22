@@ -9,7 +9,7 @@
 """
 from klinechart.model.kline import KLine, stCombineK, KSide, stFxK, stBiK, KExtreme, Segment, Pivot
 from typing import List, Optional, Union
-from klinechart.chanlun.float_compare import *
+from .float_compare import equ_than_0, less_than_0, greater_than_0
 import copy
 from typing import Tuple, Dict
 

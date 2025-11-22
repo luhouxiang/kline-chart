@@ -12,9 +12,9 @@ from datetime import datetime
 from klinechart.algo.weibi import get_weibi_list
 from typing import List, Dict, Any
 from klinechart.model.obj import Direction
-from klinechart.chanlun.c_bi import Cal_LOWER
-from klinechart.chanlun.c_bi import (Cal_UPPER, cal_independent_klines, calculate_bi, _NCHDUAN, compute_bi_pivots,
-                                     compute_duan_pivots)
+from klinechart.algo.chanlun.c_bi import Cal_LOWER
+from klinechart.algo.chanlun.c_bi import (Cal_UPPER, cal_independent_klines, calculate_bi, _NCHDUAN, compute_bi_pivots,
+                                          compute_duan_pivots)
 import logging
 
 
