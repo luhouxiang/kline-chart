@@ -578,7 +578,7 @@ class ChartCursor(QtCore.QObject):
         for index, plot in enumerate(self._plots):
             plot_name = index
             plot_info_text = buf[plot]
-            logging.info(f"{plot_name}: {plot_info_text}")
+            # logging.info(f"{plot_name}: {plot_info_text}")
             info = self._infos[plot_name]
             info.setText(plot_info_text)
             info.show()

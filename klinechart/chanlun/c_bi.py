@@ -829,14 +829,14 @@ def process_down_up(base: int, bis: Union[List[stBiK], List[Segment]]) -> Tuple[
     pivot.ed_pos_index = bis[base+2].pos_end
 
     # 从 base+4 开始继续扩展
-    i = base + 4
+    i = base + 3
     while i < len(bis):
         if not intervals_overlap(pivot.lowly_value, pivot.highly_value, bis[i].lowest, bis[i].highest):
             break
         pivot.ed_pos_index = bis[i].pos_end
         # pivot.lowly_value = max(pivot.lowly_value, bis[i].lowest)
         # pivot.highly_value = min(pivot.highly_value, bis[i].highest)
-        i += 2  # 跳过下一笔（底、顶交替）
+        i += 1  # 跳过下一笔（底、顶交替）
 
     # 更新 base 为中枢结束后的位置
     base = i
